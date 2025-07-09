@@ -1,0 +1,41 @@
+name: Build Windows Executable
+
+# 控制工作流触发的时机
+on:
+  push:
+    branches: [ "main" ] # 当代码被推送到 main 分支时触发
+
+# 一个工作流可以包含一个或多个作业(job)
+jobs:
+  build:
+    # 指定作业运行的操作系统环境
+    runs-on: windows-latest
+
+    # 作业中包含的一系列步骤
+    steps:
+      # 第 1 步：获取仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 第 2 步：设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # 可以指定你需要的 Python 版本
+
+      # 第 3 步：安装项目依赖
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 第 4 步：使用 PyInstaller 打包
+      - name: Build with PyInstaller
+        run: pyinstaller --onefile --add-data "backgrounds;backgrounds" --add-data "patches;patches" --name ImageMerger main.py
+
+      # 第 5 步：上传打包好的 .exe 文件作为产物
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImageMerger-windows-build # 上传产物的名称
+          path: dist/ImageMerger.exe      # PyInstaller 打包后 .exe 文件的路径 
