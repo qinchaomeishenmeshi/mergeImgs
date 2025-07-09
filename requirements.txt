@@ -1,2 +1,4 @@
 Pillow
-pyinstaller 
+pyinstaller
+questionary
+rich 
